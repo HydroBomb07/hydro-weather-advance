@@ -11,6 +11,7 @@ import { DarkModeToggle } from '../components/DarkModeToggle';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { AnimatedText, GlowText, ShimmerText, FloatingText } from '../components/AnimatedText';
 import { toast } from 'sonner';
+import { WeatherBackground } from '../components/WeatherBackground';
 
 interface WeatherData {
   location: {
@@ -284,6 +285,10 @@ const Index = () => {
       <AnimatedCursor />
       <div className="min-h-screen relative overflow-hidden">
         <AnimatedBackground />
+        <WeatherBackground 
+          weatherCondition={weatherData?.current.condition.text}
+          weatherIcon={weatherData?.current.condition.icon}
+        />
         <DarkModeToggle />
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-8">
