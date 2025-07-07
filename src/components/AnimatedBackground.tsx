@@ -1,16 +1,48 @@
 
+import { useEffect } from 'react';
+
 const AnimatedBackground = () => {
+  useEffect(() => {
+    // Create additional floating particles dynamically
+    const createFloatingParticles = () => {
+      const particlesContainer = document.querySelector('.particles-container');
+      if (!particlesContainer) return;
+      
+      const interval = setInterval(() => {
+        if (Math.random() > 0.7) {
+          const particle = document.createElement('div');
+          particle.className = 'particle dynamic-particle';
+          particle.style.left = Math.random() * 100 + '%';
+          particle.style.animationDuration = (Math.random() * 10 + 15) + 's';
+          particle.style.backgroundColor = `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.3})`;
+          particle.style.width = Math.random() * 4 + 2 + 'px';
+          particle.style.height = particle.style.width;
+          particlesContainer.appendChild(particle);
+          
+          setTimeout(() => {
+            particle.remove();
+          }, 25000);
+        }
+      }, 3000);
+      
+      return () => clearInterval(interval);
+    };
+    
+    const cleanup = createFloatingParticles();
+    return cleanup;
+  }, []);
+
   return (
     <>
-      {/* Gradient Background */}
+      {/* Enhanced Gradient Background */}
       <div className="fixed inset-0 bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500 animate-gradient-shift" />
       
       {/* Floating Particles */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {[...Array(15)].map((_, i) => (
+      <div className="particles-container fixed inset-0 overflow-hidden pointer-events-none">
+        {[...Array(20)].map((_, i) => (
           <div
             key={i}
-            className="absolute w-2 h-2 bg-white/60 rounded-full animate-float-particles"
+            className="particle absolute w-2 h-2 bg-white/60 rounded-full animate-float-particles"
             style={{
               left: `${Math.random() * 100}%`,
               animationDelay: `${Math.random() * 20}s`,
@@ -22,6 +54,14 @@ const AnimatedBackground = () => {
       
       {/* Overlay for better text contrast */}
       <div className="fixed inset-0 bg-black/20" />
+      
+      <style jsx>{`
+        .dynamic-particle {
+          position: absolute;
+          border-radius: 50%;
+          animation: particleFloat 20s linear infinite;
+        }
+      `}</style>
     </>
   );
 };

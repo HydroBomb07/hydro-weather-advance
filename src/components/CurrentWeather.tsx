@@ -1,4 +1,5 @@
 import { Eye, Droplets, Wind, Thermometer, Sun } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 interface WeatherData {
   location: {
@@ -32,6 +33,9 @@ interface Props {
 const CurrentWeather = ({ data, unit, onUnitChange }: Props) => {
   const temp = unit === 'C' ? data.current.temp_c : data.current.temp_f;
   const feelsLike = unit === 'C' ? data.current.feelslike_c : data.current.feelslike_f;
+  const weatherMainRef = useRef<HTMLHeadingElement>(null);
+  const [displayedText, setDisplayedText] = useState('');
+  const [showCursor, setShowCursor] = useState(true);
   
   const formatTime = (timeString: string) => {
     return new Date(timeString).toLocaleString('en-US', {
@@ -44,17 +48,53 @@ const CurrentWeather = ({ data, unit, onUnitChange }: Props) => {
     });
   };
 
+  // Typing effect for weather main text
+  useEffect(() => {
+    const text = data.current.condition.text;
+    let i = 0;
+    setDisplayedText('');
+    setShowCursor(true);
+    
+    const typeWriter = () => {
+      if (i < text.length) {
+        setDisplayedText(text.substring(0, i + 1));
+        i++;
+        setTimeout(typeWriter, 100);
+      } else {
+        setTimeout(() => setShowCursor(false), 1000);
+      }
+    };
+    
+    const timeout = setTimeout(typeWriter, 500);
+    return () => clearTimeout(timeout);
+  }, [data.current.condition.text]);
+
   const detailItems = [
     { icon: Eye, label: 'Feels like', value: `${Math.round(feelsLike)}°${unit}` },
     { icon: Droplets, label: 'Humidity', value: `${data.current.humidity}%` },
-    { icon: Wind, label: 'Wind Speed', value: `${data.current.wind_kph} km/h` },
+    { icon: Wind, label: 'Wind Speed', value: `${Math.round(data.current.wind_kph)} km/h` },
     { icon: Thermometer, label: 'Pressure', value: `${data.current.pressure_mb} mb` },
-    { icon: Sun, label: 'UV Index', value: data.current.uv.toString() },
+    { icon: Sun, label: 'UV Index', value: data.current.uv > 0 ? data.current.uv.toString() : 'N/A' },
     { icon: Eye, label: 'Visibility', value: `${data.current.vis_km} km` },
   ];
 
+  const handleUnitClick = (newUnit: 'C' | 'F') => {
+    onUnitChange(newUnit);
+    
+    // Add scale animation to button
+    const buttons = document.querySelectorAll('.unit-btn');
+    buttons.forEach(btn => {
+      if (btn.textContent?.includes(newUnit)) {
+        (btn as HTMLElement).style.transform = 'scale(1.2)';
+        setTimeout(() => {
+          (btn as HTMLElement).style.transform = '';
+        }, 200);
+      }
+    });
+  };
+
   return (
-    <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 mb-8 border border-white/20 animate-fade-in-scale">
+    <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 mb-8 border border-white/20 animate-fade-in-scale hover:bg-white/15 hover:-translate-y-2 transition-all duration-500">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-8">
         <div className="mb-6 lg:mb-0">
@@ -71,7 +111,10 @@ const CurrentWeather = ({ data, unit, onUnitChange }: Props) => {
           <img
             src={`https:${data.current.condition.icon}`}
             alt={data.current.condition.text}
-            className="w-24 h-24 lg:w-32 lg:h-32 animate-bounce filter drop-shadow-lg"
+            className="w-24 h-24 lg:w-32 lg:h-32 animate-bounce filter drop-shadow-lg hover:scale-110 transition-transform duration-300"
+            style={{
+              animation: 'weatherIconSpin 4s ease-in-out infinite'
+            }}
           />
           <div className="flex items-center gap-4">
             <span className="text-6xl lg:text-7xl font-bold text-white animate-pulse">
@@ -79,8 +122,8 @@ const CurrentWeather = ({ data, unit, onUnitChange }: Props) => {
             </span>
             <div className="flex flex-col gap-2">
               <button
-                onClick={() => onUnitChange('C')}
-                className={`px-3 py-2 rounded-lg border-2 transition-all duration-300 ${
+                onClick={() => handleUnitClick('C')}
+                className={`unit-btn px-3 py-2 rounded-lg border-2 transition-all duration-300 ${
                   unit === 'C'
                     ? 'bg-white/30 border-white/60 text-white'
                     : 'bg-white/10 border-white/30 text-white/70 hover:bg-white/20'
@@ -89,8 +132,8 @@ const CurrentWeather = ({ data, unit, onUnitChange }: Props) => {
                 °C
               </button>
               <button
-                onClick={() => onUnitChange('F')}
-                className={`px-3 py-2 rounded-lg border-2 transition-all duration-300 ${
+                onClick={() => handleUnitClick('F')}
+                className={`unit-btn px-3 py-2 rounded-lg border-2 transition-all duration-300 ${
                   unit === 'F'
                     ? 'bg-white/30 border-white/60 text-white'
                     : 'bg-white/10 border-white/30 text-white/70 hover:bg-white/20'
@@ -103,19 +146,26 @@ const CurrentWeather = ({ data, unit, onUnitChange }: Props) => {
         </div>
       </div>
 
-      {/* Description */}
+      {/* Description with typing effect */}
       <div className="text-center mb-8">
-        <h3 className="text-2xl font-semibold text-white mb-2 capitalize">
-          {data.current.condition.text}
+        <h3 
+          ref={weatherMainRef}
+          className="text-2xl font-semibold text-white mb-2 capitalize"
+          style={{
+            borderRight: showCursor ? '2px solid white' : 'none',
+            minHeight: '2rem'
+          }}
+        >
+          {displayedText}
         </h3>
       </div>
 
-      {/* Weather Details Grid */}
+      {/* Weather Details Grid with stagger animation */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {detailItems.map((item, index) => (
           <div
             key={item.label}
-            className="flex items-center gap-4 p-5 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300 hover:-translate-y-1 animate-slide-in-up"
+            className="flex items-center gap-4 p-5 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300 hover:-translate-y-1 animate-slide-in-up hover:scale-105"
             style={{ animationDelay: `${index * 0.1}s` }}
           >
             <item.icon className="w-6 h-6 text-blue-300 filter drop-shadow-sm" />
@@ -126,6 +176,16 @@ const CurrentWeather = ({ data, unit, onUnitChange }: Props) => {
           </div>
         ))}
       </div>
+      
+      <style jsx>{`
+        @keyframes weatherIconSpin {
+          0% { transform: rotate(0deg) scale(1); }
+          25% { transform: rotate(5deg) scale(1.1); }
+          50% { transform: rotate(0deg) scale(1.2); }
+          75% { transform: rotate(-5deg) scale(1.1); }
+          100% { transform: rotate(0deg) scale(1); }
+        }
+      `}</style>
     </div>
   );
 };

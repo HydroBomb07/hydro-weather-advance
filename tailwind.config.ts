@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -169,6 +168,28 @@ export default {
 						transform: 'translateY(-100px) rotate(360deg)',
 						opacity: '0'
 					}
+				},
+				'weather-icon-spin': {
+					'0%': { transform: 'rotate(0deg) scale(1)' },
+					'25%': { transform: 'rotate(5deg) scale(1.1)' },
+					'50%': { transform: 'rotate(0deg) scale(1.2)' },
+					'75%': { transform: 'rotate(-5deg) scale(1.1)' },
+					'100%': { transform: 'rotate(0deg) scale(1)' }
+				},
+				'typing': {
+					'from': { width: '0' },
+					'to': { width: '100%' }
+				},
+				'blink': {
+					'50%': { borderColor: 'transparent' }
+				},
+				'ripple': {
+					'0%': { transform: 'scale(0)', opacity: '1' },
+					'100%': { transform: 'scale(4)', opacity: '0' }
+				},
+				'float': {
+					'0%, 100%': { transform: 'translateY(0px)' },
+					'50%': { transform: 'translateY(-10px)' }
 				}
 			},
 			animation: {
@@ -181,7 +202,12 @@ export default {
 				'pulse-soft': 'pulse-soft 3s ease-in-out infinite',
 				'shake': 'shake 0.6s ease-in-out',
 				'gradient-shift': 'gradient-shift 8s ease infinite',
-				'float-particles': 'float-particles 25s linear infinite'
+				'float-particles': 'float-particles 25s linear infinite',
+				'weather-icon-spin': 'weather-icon-spin 4s ease-in-out infinite',
+				'typing': 'typing 2s steps(20) 1s both',
+				'blink': 'blink 1s step-end infinite',
+				'ripple': 'ripple 0.6s linear',
+				'float': 'float 6s ease-in-out infinite'
 			}
 		}
 	},
