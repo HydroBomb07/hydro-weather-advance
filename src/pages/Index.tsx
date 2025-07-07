@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Search, Cloud, Sun, Eye, Tint, Wind, Thermometer, Calendar } from 'lucide-react';
+import { Search, Cloud, Sun, Eye, Droplets, Wind, Thermometer, Calendar } from 'lucide-react';
 import { WeatherService } from '../services/WeatherService';
 import { CurrentWeather } from '../components/CurrentWeather';
 import { ForecastSection } from '../components/ForecastSection';

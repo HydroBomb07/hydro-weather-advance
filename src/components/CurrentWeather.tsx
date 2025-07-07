@@ -1,5 +1,4 @@
-
-import { Eye, Tint, Wind, Thermometer, Sun } from 'lucide-react';
+import { Eye, Droplets, Wind, Thermometer, Sun } from 'lucide-react';
 
 interface WeatherData {
   location: {
@@ -47,7 +46,7 @@ const CurrentWeather = ({ data, unit, onUnitChange }: Props) => {
 
   const detailItems = [
     { icon: Eye, label: 'Feels like', value: `${Math.round(feelsLike)}°${unit}` },
-    { icon: Tint, label: 'Humidity', value: `${data.current.humidity}%` },
+    { icon: Droplets, label: 'Humidity', value: `${data.current.humidity}%` },
     { icon: Wind, label: 'Wind Speed', value: `${data.current.wind_kph} km/h` },
     { icon: Thermometer, label: 'Pressure', value: `${data.current.pressure_mb} mb` },
     { icon: Sun, label: 'UV Index', value: data.current.uv.toString() },
