@@ -1,4 +1,3 @@
-
 const API_KEY = '575fcf489cce2ff7e3b873f8eca5c92c';
 const BASE_URL = 'https://api.openweathermap.org/data/2.5';
 
@@ -12,7 +11,8 @@ export class WeatherService {
       
       return {
         current: this.transformWeatherData(weatherResponse),
-        forecast: this.transformForecastData(forecastResponse)
+        forecast: this.transformForecastData(forecastResponse),
+        hourly: this.transformHourlyData(forecastResponse)
       };
     } catch (error) {
       if (error instanceof Error) {
@@ -31,7 +31,8 @@ export class WeatherService {
       
       return {
         current: this.transformWeatherData(weatherResponse),
-        forecast: this.transformForecastData(forecastResponse)
+        forecast: this.transformForecastData(forecastResponse),
+        hourly: this.transformHourlyData(forecastResponse)
       };
     } catch (error) {
       if (error instanceof Error) {
@@ -108,7 +109,7 @@ export class WeatherService {
         humidity: data.main.humidity,
         wind_kph: data.wind.speed * 3.6,
         pressure_mb: data.main.pressure,
-        uv: 0, // OpenWeatherMap doesn't provide UV in basic plan
+        uv: 0,
         vis_km: data.visibility ? data.visibility / 1000 : 10
       }
     };
@@ -144,5 +145,23 @@ export class WeatherService {
     });
     
     return Object.values(dailyData).slice(0, 5);
+  }
+
+  private static transformHourlyData(data: any) {
+    return data.list.slice(0, 24).map((item: any) => {
+      const date = new Date(item.dt * 1000);
+      return {
+        time: date.toLocaleTimeString('en-US', { 
+          hour: '2-digit', 
+          minute: '2-digit',
+          hour12: false 
+        }),
+        temp: item.main.temp,
+        icon: `//openweathermap.org/img/wn/${item.weather[0].icon}@2x.png`,
+        description: item.weather[0].description,
+        humidity: item.main.humidity,
+        windSpeed: item.wind.speed * 3.6
+      };
+    });
   }
 }

@@ -1,5 +1,7 @@
+
 import { Eye, Droplets, Wind, Thermometer, Sun } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { AnimatedText, GlowText } from './AnimatedText';
 
 interface WeatherData {
   location: {
@@ -48,7 +50,6 @@ const CurrentWeather = ({ data, unit, onUnitChange }: Props) => {
     });
   };
 
-  // Typing effect for weather main text
   useEffect(() => {
     const text = data.current.condition.text;
     let i = 0;
@@ -81,7 +82,6 @@ const CurrentWeather = ({ data, unit, onUnitChange }: Props) => {
   const handleUnitClick = (newUnit: 'C' | 'F') => {
     onUnitChange(newUnit);
     
-    // Add scale animation to button
     const buttons = document.querySelectorAll('.unit-btn');
     buttons.forEach(btn => {
       if (btn.textContent?.includes(newUnit)) {
@@ -94,14 +94,18 @@ const CurrentWeather = ({ data, unit, onUnitChange }: Props) => {
   };
 
   return (
-    <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 mb-8 border border-white/20 animate-fade-in-scale hover:bg-white/15 hover:-translate-y-2 transition-all duration-500">
+    <div className="bg-white/10 dark:bg-black/20 backdrop-blur-lg rounded-3xl p-8 mb-8 border border-white/20 dark:border-gray-600 animate-fade-in-scale hover:bg-white/15 dark:hover:bg-black/25 hover:-translate-y-2 transition-all duration-500">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-8">
         <div className="mb-6 lg:mb-0">
           <h2 className="text-4xl lg:text-5xl font-bold text-white mb-2 animate-glow">
-            {data.location.name}
+            <GlowText>
+              <AnimatedText text={data.location.name} speed={100} />
+            </GlowText>
           </h2>
-          <p className="text-white/80 text-lg mb-2">{data.location.country}</p>
+          <p className="text-white/80 text-lg mb-2">
+            <AnimatedText text={data.location.country} delay={1000} speed={50} />
+          </p>
           <p className="text-white/70 animate-pulse-soft">
             {formatTime(data.location.localtime)}
           </p>
@@ -111,13 +115,10 @@ const CurrentWeather = ({ data, unit, onUnitChange }: Props) => {
           <img
             src={`https:${data.current.condition.icon}`}
             alt={data.current.condition.text}
-            className="w-24 h-24 lg:w-32 lg:h-32 animate-bounce filter drop-shadow-lg hover:scale-110 transition-transform duration-300"
-            style={{
-              animation: 'weatherIconSpin 4s ease-in-out infinite'
-            }}
+            className="w-24 h-24 lg:w-32 lg:h-32 animate-bounce filter drop-shadow-lg hover:scale-110 transition-transform duration-300 animate-weather-icon-spin"
           />
           <div className="flex items-center gap-4">
-            <span className="text-6xl lg:text-7xl font-bold text-white animate-pulse">
+            <span className="text-6xl lg:text-7xl font-bold text-white animate-pulse animate-number-count">
               {Math.round(temp)}°
             </span>
             <div className="flex flex-col gap-2">
@@ -160,32 +161,22 @@ const CurrentWeather = ({ data, unit, onUnitChange }: Props) => {
         </h3>
       </div>
 
-      {/* Weather Details Grid with stagger animation */}
+      {/* Weather Details Grid with enhanced animations */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {detailItems.map((item, index) => (
           <div
             key={item.label}
-            className="flex items-center gap-4 p-5 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300 hover:-translate-y-1 animate-slide-in-up hover:scale-105"
+            className="flex items-center gap-4 p-5 bg-white/10 dark:bg-black/10 rounded-2xl backdrop-blur-sm border border-white/20 dark:border-gray-600 hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-300 hover:-translate-y-1 animate-slide-in-up hover:scale-105 group"
             style={{ animationDelay: `${index * 0.1}s` }}
           >
-            <item.icon className="w-6 h-6 text-blue-300 filter drop-shadow-sm" />
+            <item.icon className="w-6 h-6 text-blue-300 dark:text-purple-400 filter drop-shadow-sm group-hover:scale-110 transition-transform duration-300" />
             <div className="flex-1">
               <span className="text-white/90 font-medium">{item.label}</span>
             </div>
-            <span className="text-white font-bold text-lg">{item.value}</span>
+            <span className="text-white font-bold text-lg animate-counter">{item.value}</span>
           </div>
         ))}
       </div>
-      
-      <style jsx>{`
-        @keyframes weatherIconSpin {
-          0% { transform: rotate(0deg) scale(1); }
-          25% { transform: rotate(5deg) scale(1.1); }
-          50% { transform: rotate(0deg) scale(1.2); }
-          75% { transform: rotate(-5deg) scale(1.1); }
-          100% { transform: rotate(0deg) scale(1); }
-        }
-      `}</style>
     </div>
   );
 };

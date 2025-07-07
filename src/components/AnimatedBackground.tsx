@@ -35,14 +35,14 @@ const AnimatedBackground = () => {
   return (
     <>
       {/* Enhanced Gradient Background */}
-      <div className="fixed inset-0 bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500 animate-gradient-shift" />
+      <div className="fixed inset-0 bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500 dark:from-gray-900 dark:via-purple-900 dark:to-black animate-gradient-shift" />
       
       {/* Floating Particles */}
       <div className="particles-container fixed inset-0 overflow-hidden pointer-events-none">
         {[...Array(20)].map((_, i) => (
           <div
             key={i}
-            className="particle absolute w-2 h-2 bg-white/60 rounded-full animate-float-particles"
+            className="particle absolute w-2 h-2 bg-white/60 dark:bg-purple-400/60 rounded-full animate-float-particles"
             style={{
               left: `${Math.random() * 100}%`,
               animationDelay: `${Math.random() * 20}s`,
@@ -53,15 +53,7 @@ const AnimatedBackground = () => {
       </div>
       
       {/* Overlay for better text contrast */}
-      <div className="fixed inset-0 bg-black/20" />
-      
-      <style jsx>{`
-        .dynamic-particle {
-          position: absolute;
-          border-radius: 50%;
-          animation: particleFloat 20s linear infinite;
-        }
-      `}</style>
+      <div className="fixed inset-0 bg-black/20 dark:bg-black/40" />
     </>
   );
 };
