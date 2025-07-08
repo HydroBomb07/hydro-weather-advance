@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 
 interface WeatherBackgroundProps {
   weatherCondition?: string;
@@ -31,123 +31,122 @@ const WeatherBackground = ({ weatherCondition, weatherIcon }: WeatherBackgroundP
     }
   }, [weatherCondition, weatherIcon]);
 
-  const createRainDrops = () => {
-    return [...Array(100)].map((_, i) => (
-      <div
-        key={`rain-${i}`}
-        className="absolute opacity-60 bg-blue-300 rounded-full animate-rain-fall"
-        style={{
-          left: `${Math.random() * 100}%`,
-          width: `${Math.random() * 3 + 1}px`,
-          height: `${Math.random() * 15 + 10}px`,
-          animationDelay: `${Math.random() * 2}s`,
-          animationDuration: `${Math.random() * 1 + 0.5}s`,
-          transform: `rotate(${Math.random() * 30}deg)`,
-        }}
-      />
-    ));
-  };
-
-  const createSnowFlakes = () => {
+  // Memoize expensive calculations
+  const rainDrops = useMemo(() => {
     return [...Array(50)].map((_, i) => (
       <div
-        key={`snow-${i}`}
-        className="absolute opacity-80 bg-white rounded-full animate-snow-fall"
+        key={`rain-${i}`}
+        className="absolute opacity-60 bg-blue-300 rounded-full animate-rain-fall will-change-transform"
         style={{
           left: `${Math.random() * 100}%`,
-          width: `${Math.random() * 8 + 4}px`,
-          height: `${Math.random() * 8 + 4}px`,
-          animationDelay: `${Math.random() * 3}s`,
-          animationDuration: `${Math.random() * 3 + 2}s`,
+          width: `${Math.random() * 2 + 1}px`,
+          height: `${Math.random() * 10 + 8}px`,
+          animationDelay: `${Math.random() * 2}s`,
+          animationDuration: `${Math.random() * 0.5 + 0.8}s`,
+          transform: `rotate(${Math.random() * 20}deg)`,
         }}
       />
     ));
-  };
+  }, []);
 
-  const createLightning = () => {
-    return (
-      <div className="absolute inset-0 pointer-events-none">
-        <div 
-          className="absolute inset-0 bg-white opacity-0 animate-lightning"
-          style={{
-            animationDelay: `${Math.random() * 5}s`,
-            animationDuration: '0.2s',
-            animationIterationCount: 'infinite'
-          }}
-        />
-      </div>
-    );
-  };
+  const snowFlakes = useMemo(() => {
+    return [...Array(30)].map((_, i) => (
+      <div
+        key={`snow-${i}`}
+        className="absolute opacity-80 bg-white rounded-full animate-snow-fall will-change-transform"
+        style={{
+          left: `${Math.random() * 100}%`,
+          width: `${Math.random() * 6 + 3}px`,
+          height: `${Math.random() * 6 + 3}px`,
+          animationDelay: `${Math.random() * 3}s`,
+          animationDuration: `${Math.random() * 2 + 3}s`,
+        }}
+      />
+    ));
+  }, []);
 
-  const createFogEffect = () => {
-    return [...Array(5)].map((_, i) => (
+  const lightning = useMemo(() => (
+    <div className="absolute inset-0 pointer-events-none">
+      <div 
+        className="absolute inset-0 bg-white opacity-0 animate-lightning will-change-opacity"
+        style={{
+          animationDelay: `${Math.random() * 5}s`,
+          animationDuration: '0.2s',
+          animationIterationCount: 'infinite'
+        }}
+      />
+    </div>
+  ), []);
+
+  const fogEffect = useMemo(() => {
+    return [...Array(3)].map((_, i) => (
       <div
         key={`fog-${i}`}
-        className="absolute bg-gray-300 dark:bg-gray-600 opacity-30 rounded-full animate-fog-drift"
+        className="absolute bg-gray-300 dark:bg-gray-600 opacity-30 rounded-full animate-fog-drift will-change-transform"
         style={{
           left: `${Math.random() * 100}%`,
           top: `${Math.random() * 100}%`,
-          width: `${Math.random() * 200 + 100}px`,
-          height: `${Math.random() * 100 + 50}px`,
+          width: `${Math.random() * 150 + 80}px`,
+          height: `${Math.random() * 80 + 40}px`,
           animationDelay: `${Math.random() * 5}s`,
-          animationDuration: `${Math.random() * 10 + 10}s`,
-          filter: 'blur(40px)',
+          animationDuration: `${Math.random() * 8 + 12}s`,
+          filter: 'blur(30px)',
         }}
       />
     ));
-  };
+  }, []);
 
-  const createCloudyEffect = () => {
-    return [...Array(8)].map((_, i) => (
+  const cloudyEffect = useMemo(() => {
+    return [...Array(5)].map((_, i) => (
       <div
         key={`cloud-${i}`}
-        className="absolute bg-white dark:bg-gray-300 opacity-20 rounded-full animate-cloud-drift"
+        className="absolute bg-white dark:bg-gray-300 opacity-20 rounded-full animate-cloud-drift will-change-transform"
         style={{
           left: `${Math.random() * 120 - 10}%`,
           top: `${Math.random() * 60}%`,
-          width: `${Math.random() * 150 + 80}px`,
-          height: `${Math.random() * 80 + 40}px`,
+          width: `${Math.random() * 120 + 60}px`,
+          height: `${Math.random() * 60 + 30}px`,
           animationDelay: `${Math.random() * 10}s`,
-          animationDuration: `${Math.random() * 20 + 30}s`,
-          filter: 'blur(20px)',
+          animationDuration: `${Math.random() * 15 + 25}s`,
+          filter: 'blur(15px)',
         }}
       />
     ));
-  };
+  }, []);
 
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
       {/* Weather-specific effects */}
       {weatherType === 'rain' && (
         <div className="absolute inset-0">
-          {createRainDrops()}
+          {rainDrops}
         </div>
       )}
       
       {weatherType === 'snow' && (
         <div className="absolute inset-0">
-          {createSnowFlakes()}
+          {snowFlakes}
         </div>
       )}
       
       {weatherType === 'storm' && (
         <>
           <div className="absolute inset-0">
-            {createRainDrops()}
+            {rainDrops}
           </div>
-          {createLightning()}
+          {lightning}
         </>
       )}
       
       {weatherType === 'fog' && (
         <div className="absolute inset-0">
-          {createFogEffect()}
+          {fogEffect}
         </div>
       )}
       
       {weatherType === 'cloudy' && (
         <div className="absolute inset-0">
-          {createCloudyEffect()}
+          {cloudyEffect}
         </div>
       )}
     </div>

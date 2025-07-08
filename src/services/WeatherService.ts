@@ -148,7 +148,18 @@ export class WeatherService {
   }
 
   private static transformHourlyData(data: any) {
-    return data.list.slice(0, 24).map((item: any) => {
+    // Get current time
+    const now = new Date();
+    const currentHour = now.getHours();
+    
+    // Filter to get only next 24 hours from current time
+    const next24Hours = data.list.filter((item: any) => {
+      const itemDate = new Date(item.dt * 1000);
+      const hoursDiff = (itemDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+      return hoursDiff >= 0 && hoursDiff <= 24;
+    }).slice(0, 24);
+    
+    return next24Hours.map((item: any) => {
       const date = new Date(item.dt * 1000);
       return {
         time: date.toLocaleTimeString('en-US', { 
