@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, Cloud, MapPin } from 'lucide-react';
+import { Search, Cloud, MapPin, ArrowUp } from 'lucide-react';
 import { WeatherService } from '../services/WeatherService';
 import { CurrentWeather } from '../components/CurrentWeather';
 import { ForecastSection } from '../components/ForecastSection';
@@ -68,6 +68,7 @@ const Index = () => {
   const [error, setError] = useState('');
   const [unit, setUnit] = useState<'C' | 'F'>('C');
   const [isSearching, setIsSearching] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const searchBtnRef = useRef<HTMLButtonElement>(null);
 
@@ -267,8 +268,17 @@ const Index = () => {
       });
     };
 
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+
     document.addEventListener('mousemove', handleMouseMove);
-    return () => document.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener('scroll', handleScroll);
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -279,6 +289,13 @@ const Index = () => {
       return () => clearTimeout(timeoutId);
     }
   }, [unit]);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
 
   return (
     <>
@@ -291,18 +308,33 @@ const Index = () => {
         />
         <DarkModeToggle />
         
+        {/* Scroll to Top Button */}
+        {showScrollTop && (
+          <button
+            onClick={scrollToTop}
+            className="fixed bottom-8 right-8 z-50 p-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 animate-fade-in-scale"
+            aria-label="Scroll to top"
+          >
+            <ArrowUp className="w-6 h-6" />
+          </button>
+        )}
+        
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-8">
           {/* Header with enhanced animations */}
           <header className="text-center mb-12 animate-fade-in">
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 flex items-center justify-center gap-4 animate-float">
               <Cloud className="animate-pulse" />
               <GlowText>
-                <AnimatedText text="Weather Dashboard" delay={500} speed={150} />
+                <span className="animate-text-slide">Weather Dashboard</span>
               </GlowText>
             </h1>
             <p className="text-xl text-white/90 font-light animate-fade-in animate-pulse-soft" style={{ animationDelay: '0.2s' }}>
               <ShimmerText>
-                <FloatingText>Get real-time weather information for any city</FloatingText>
+                <FloatingText>
+                  <span className="animate-text-slide" style={{ animationDelay: '0.5s' }}>
+                    Get real-time weather information for any city
+                  </span>
+                </FloatingText>
               </ShimmerText>
             </p>
           </header>
